@@ -10,27 +10,28 @@ module CouchRest
   autoload :Pager,        'pager'
   autoload :FileManager,  'file_manager'
 
-  class << self
+  module_function
+
     def new(uri='http://localhost:5984')
       Server.new(uri)
     end
 
     def put(uri, doc=nil)
       payload = doc.to_json if doc
-      JSON.parse(RestClient.put(uri, payload))
+      json RestClient.put(uri, payload)
     end
   
     def get(uri)
-      JSON.parse(RestClient.get(uri), :max_nesting => false)
+      json(RestClient.get(uri), :max_nesting => false)
     end
     
     def post(uri, doc=nil)
       payload = doc.to_json if doc
-      JSON.parse(RestClient.post(uri, payload))
+      json RestClient.post(uri, payload)
     end
     
     def delete(uri)
-      JSON.parse(RestClient.delete(uri))
+      json RestClient.delete(uri)
     end
     
     def paramify_url(url, params=nil)
@@ -43,5 +44,8 @@ module CouchRest
       end
       url
     end
-  end
+
+    def json(json_string, options={})
+      JSON.parse(json_string, options)
+    end
 end

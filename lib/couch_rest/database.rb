@@ -5,7 +5,7 @@ module CouchRest
   class Database
     attr_accessor :host, :name
 
-    def initialize host, name
+    def initialize(host, name)
       @name = name
       @host = host
       @root = "#{host}/#{name}"
@@ -16,13 +16,13 @@ module CouchRest
     end
     
     def documents(params=nil)
-      url = CouchRest.paramify_url "#{@root}/_all_docs", params
-      CouchRest.get url  
+      url = CouchRest.paramify_url("#{@root}/_all_docs", params)
+      CouchRest.get(url)
     end
   
     def temp_view(funcs, params=nil)
-      url = CouchRest.paramify_url "#{@root}/_temp_view", params
-      JSON.parse(RestClient.post(url, funcs.to_json, {"Content-Type" => 'application/json'}))
+      url = CouchRest.paramify_url("#{@root}/_temp_view", params)
+      CouchRest.json(RestClient.post(url, funcs.to_json, 'Content-Type' => 'application/json'))
     end
   
     def view(name, params=nil)
