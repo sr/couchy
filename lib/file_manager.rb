@@ -12,8 +12,9 @@ class CouchRest
       "png"   => "image/png",
       "css"   => "text/css",
       "js"    => "test/javascript"
-    }    
-    def initialize(dbname, host="http://localhost:5984")
+    }
+
+    def initialize(dbname, host='http://localhost:5984')
       @db = CouchRest.new(host).database(dbname)
     end
     

@@ -4,6 +4,7 @@ require "base64"
 class CouchRest
   class Database
     attr_accessor :host, :name
+
     def initialize host, name
       @name = name
       @host = host
@@ -14,45 +15,46 @@ class CouchRest
       @root
     end
     
-    def documents params = nil
+    def documents(params=nil)
       url = CouchRest.paramify_url "#{@root}/_all_docs", params
       CouchRest.get url  
     end
   
-    def temp_view funcs, params = nil
+    def temp_view(funcs, params=nil)
       url = CouchRest.paramify_url "#{@root}/_temp_view", params
       JSON.parse(RestClient.post(url, funcs.to_json, {"Content-Type" => 'application/json'}))
     end
   
-    def view name, params = nil
+    def view(name, params=nil)
       url = CouchRest.paramify_url "#{@root}/_view/#{name}", params
       CouchRest.get url
     end
 
     # experimental
-    def search params = nil
+    def search(params=nil)
       url = CouchRest.paramify_url "#{@root}/_search", params
       CouchRest.get url
     end
+
     # experimental
-    def action action, params = nil
+    def action(action, params=nil)
       url = CouchRest.paramify_url "#{@root}/_action/#{action}", params
       CouchRest.get url
     end
     
-    def get id
+    def get(id)
       slug = CGI.escape(id) 
       CouchRest.get "#{@root}/#{slug}"
     end
     
-    def fetch_attachment doc, name
+    def fetch_attachment(doc, name)
       doc = CGI.escape(doc)
       name = CGI.escape(name)
       RestClient.get "#{@root}/#{doc}/#{name}"
     end
     
     # PUT or POST depending on presence of _id attribute
-    def save doc
+    def save(doc)
       if doc['_attachments']
         doc['_attachments'] = encode_attachments(doc['_attachments'])
       end
@@ -64,11 +66,11 @@ class CouchRest
       end
     end
     
-    def bulk_save docs
+    def bulk_save(docs)
       CouchRest.post "#{@root}/_bulk_docs", {:docs => docs}
     end
     
-    def delete doc
+    def delete(doc)
       slug = CGI.escape(doc['_id'])
       CouchRest.delete "#{@root}/#{slug}?rev=#{doc['_rev']}"
     end
@@ -76,16 +78,18 @@ class CouchRest
     def delete!
       CouchRest.delete @root
     end
+
     private
-    def encode_attachments attachments
-      attachments.each do |k,v|
-        next if v['stub']
-        v['data'] = base64(v['data'])
+      def encode_attachments(attachments)
+        attachments.each do |k,v|
+          next if v['stub']
+          v['data'] = base64(v['data'])
+        end
+        attachments
       end
-      attachments
-    end
-    def base64 data
-      Base64.encode64(data).gsub(/\s/,'')
-    end
+
+      def base64(data)
+        Base64.encode64(data).gsub(/\s/,'')
+      end
   end
 end
