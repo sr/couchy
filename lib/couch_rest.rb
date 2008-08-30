@@ -1,36 +1,20 @@
-class CouchRest
-  attr_accessor :uri
+require 'rubygems'
+require 'json'
+require 'rest_client'
 
-  def initialize(server='http://localhost:5984')
-    @uri = server
-  end
-  
-  # list all databases on the server
-  def databases
-    CouchRest.get "#{@uri}/_all_dbs"
-  end
-  
-  def database(name)
-    CouchRest::Database.new(@uri, name)
-  end
-  
-  # create a database
-  def create_db(name)
-    CouchRest.put "#{@uri}/#{name}"
-    database name
-  end
+$:.unshift File.dirname(__FILE__) + '/couch_rest'
 
-  # get the welcome message
-  def info
-    CouchRest.get "#{@uri}/"
-  end
-
-  # restart the couchdb instance
-  def restart!
-    CouchRest.post "#{@uri}/_restart"
-  end
+module CouchRest
+  autoload :Server,       'server'
+  autoload :Database,     'database'
+  autoload :Pager,        'pager'
+  autoload :FileManager,  'file_manager'
 
   class << self
+    def new(uri='http://localhost:5984')
+      Server.new(uri)
+    end
+
     def put(uri, doc=nil)
       payload = doc.to_json if doc
       JSON.parse(RestClient.put(uri, payload))
@@ -59,5 +43,5 @@ class CouchRest
       end
       url
     end
-  end  
+  end
 end

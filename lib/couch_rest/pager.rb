@@ -14,7 +14,7 @@ module Enumerable
   end
 end
 
-class CouchRest
+module CouchRest
   class Pager
     attr_accessor :db
     def initialize db
