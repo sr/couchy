@@ -1,37 +1,37 @@
 require File.dirname(__FILE__) + '/spec_helper'
+require File.dirname(__FILE__) + '/../lib/couch_rest'
 
 describe CouchRest::FileManager do
   before(:all) do
-    @cr = CouchRest.new(COUCHHOST)
-    @db = @cr.database(TESTDB)
+    @cr = CouchRest.new(CouchHost)
+    @db = @cr.database(TestDatabase)
     @db.delete! rescue nil
-    @db = @cr.create_db(TESTDB) rescue nil
+    @db = @cr.create_db(TestDatabase) rescue nil
   end
   it "should initialize" do
-    @fm = CouchRest::FileManager.new(TESTDB)
+    @fm = CouchRest::FileManager.new(TestDatabase)
     @fm.should_not be_nil
   end
   it "should require a db name" do
     lambda{CouchRest::FileManager.new}.should raise_error
   end
   it "should accept a db name" do
-    @fm = CouchRest::FileManager.new(TESTDB, 'http://localhost')
-    @fm.db.name.should == TESTDB
+    @fm = CouchRest::FileManager.new(TestDatabase, 'http://localhost')
+    @fm.db.name.should == TestDatabase
   end
   it "should default to localhost couchdb" do
-    @fm = CouchRest::FileManager.new(TESTDB)
-    @fm.db.host.should == 'http://localhost:5984'
+    @fm = CouchRest::FileManager.new(TestDatabase)
   end
 end
 
 describe CouchRest::FileManager, "pushing views" do
   before(:all) do
-    @cr = CouchRest.new(COUCHHOST)
-    @db = @cr.database(TESTDB)
+    @cr = CouchRest.new(CouchHost)
+    @db = @cr.database(TestDatabase)
     @db.delete! rescue nil
-    @db = @cr.create_db(TESTDB) rescue nil
+    @db = @cr.create_db(TestDatabase) rescue nil
     
-    @fm = CouchRest::FileManager.new(TESTDB, COUCHHOST)
+    @fm = CouchRest::FileManager.new(TestDatabase, CouchHost)
     @view_dir = File.dirname(__FILE__) + '/fixtures/views'
     ds = @fm.push_views(@view_dir)
     @design = @db.get("_design/test_view")
@@ -59,12 +59,12 @@ end
 
 describe CouchRest::FileManager, "pushing a directory with id" do
   before(:all) do
-    @cr = CouchRest.new(COUCHHOST)
-    @db = @cr.database(TESTDB)
+    @cr = CouchRest.new(CouchHost)
+    @db = @cr.database(TestDatabase)
     @db.delete! rescue nil
-    @db = @cr.create_db(TESTDB) rescue nil
+    @db = @cr.create_db(TestDatabase) rescue nil
     
-    @fm = CouchRest::FileManager.new(TESTDB, COUCHHOST)
+    @fm = CouchRest::FileManager.new(TestDatabase, CouchHost)
     @push_dir = File.dirname(__FILE__) + '/fixtures/attachments'
     ds = @fm.push_directory(@push_dir, 'attached')
   end
@@ -83,12 +83,12 @@ end
 
 describe CouchRest::FileManager, "pushing a directory without id" do
   before(:all) do
-    @cr = CouchRest.new(COUCHHOST)
-    @db = @cr.database(TESTDB)
+    @cr = CouchRest.new(CouchHost)
+    @db = @cr.database(TestDatabase)
     @db.delete! rescue nil
-    @db = @cr.create_db(TESTDB) rescue nil
+    @db = @cr.create_db(TestDatabase) rescue nil
     
-    @fm = CouchRest::FileManager.new(TESTDB, COUCHHOST)
+    @fm = CouchRest::FileManager.new(TestDatabase, CouchHost)
     @push_dir = File.dirname(__FILE__) + '/fixtures/attachments'
     ds = @fm.push_directory(@push_dir)
   end
@@ -100,12 +100,12 @@ end
 
 describe CouchRest::FileManager, "pushing a directory/ without id" do
   before(:all) do
-    @cr = CouchRest.new(COUCHHOST)
-    @db = @cr.database(TESTDB)
+    @cr = CouchRest.new(CouchHost)
+    @db = @cr.database(TestDatabase)
     @db.delete! rescue nil
-    @db = @cr.create_db(TESTDB) rescue nil
+    @db = @cr.create_db(TestDatabase) rescue nil
     
-    @fm = CouchRest::FileManager.new(TESTDB, COUCHHOST)
+    @fm = CouchRest::FileManager.new(TestDatabase, CouchHost)
     @push_dir = File.dirname(__FILE__) + '/fixtures/attachments/'
     ds = @fm.push_directory(@push_dir)
   end

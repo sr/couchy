@@ -1,11 +1,11 @@
 require File.dirname(__FILE__) + '/spec_helper'
-
+require File.dirname(__FILE__) + '/../lib/couch_rest'
 describe CouchRest::Pager do
   before(:all) do
-    @cr = CouchRest.new(COUCHHOST)
-    @db = @cr.database(TESTDB)
+    @cr = CouchRest.new(CouchHost)
+    @db = @cr.database(TestDatabase)
     @db.delete! rescue nil
-    @db = @cr.create_db(TESTDB) rescue nil
+    @db = @cr.create_db(TestDatabase) rescue nil
     @pager = CouchRest::Pager.new(@db)
   end
   

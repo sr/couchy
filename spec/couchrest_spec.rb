@@ -1,71 +1,71 @@
 require File.dirname(__FILE__) + '/spec_helper'
+require File.dirname(__FILE__) + '/../lib/couch_rest'
 
 describe CouchRest do
-
   before(:each) do
-    @cr = CouchRest.new(COUCHHOST)
-    begin
-      @db = @cr.database(TESTDB)
-      @db.delete! rescue nil      
-    end
+    @couch_rest = CouchRest.new(CouchHost)
+    @database = @couch_rest.database(TestDatabase)
   end
 
   after(:each) do
     begin
-      @db.delete! rescue nil
+      @database.delete!
+    rescue RestClient::ResourceNotFound
+      nil
     end
   end
 
-  describe "getting info" do
-    it "should list databases" do
-      @cr.databases.should be_an_instance_of(Array)
+  describe 'Getting info' do
+    it 'list databases' do
+      @couch_rest.databases.should be_an_instance_of(Array)
     end
-    it "should get info" do
-      @cr.info["couchdb"].should == "Welcome"
-      @cr.info.class.should == Hash   
-    end
-  end
-  
-  describe "description" do
-    it "should restart" do
-      @cr.restart!
+
+    it 'should get info' do
+      @couch_rest.info.should have_key('couchdb')
+      @couch_rest.info.should have_key('version')
     end
   end
 
-  describe "initializing a database" do
-    it "should return a db" do
-      db = @cr.database(TESTDB)
-      db.should be_an_instance_of(CouchRest::Database)
-      db.host.should == @cr.uri
-    end
+  it 'should restart' do
+    @couch_rest.restart!
   end
 
-  describe "successfully creating a database" do
-    it "should start without a database" do
-      @cr.databases.should_not include(TESTDB)
-    end
-    it "should return the created database" do
-      db = @cr.create_db(TESTDB)
+  describe 'initializing a database' do
+    it 'should return a database' do
+      db = @couch_rest.database(TestDatabase)
       db.should be_an_instance_of(CouchRest::Database)
     end
-    it "should create the database" do
-      db = @cr.create_db(TESTDB)
-      @cr.databases.should include(TESTDB)
+  end
+
+  describe 'successfully creating a database' do
+    it 'should start without a database' do
+      @couch_rest.databases.should_not include(TestDatabase)
+    end
+
+    it 'should return the created database' do
+      db = @couch_rest.create_db(TestDatabase)
+      db.should be_an_instance_of(CouchRest::Database)
+    end
+
+    it 'should create the database' do
+      db = @couch_rest.create_db(TestDatabase)
+      @couch_rest.databases.should include(TestDatabase)
     end
   end
 
-  describe "failing to create a database because the name is taken" do
+  describe 'failing to create a database because the name is taken' do
     before(:each) do
-      db = @cr.create_db(TESTDB)
+      @couch_rest.create_db(TestDatabase)
     end
-    it "should start with the test database" do
-      @cr.databases.should include(TESTDB)
+
+    it 'should start with the test database' do
+      @couch_rest.databases.should include(TestDatabase)
     end
-    it "should PUT the database and raise an error" do
-      lambda{
-        @cr.create_db(TESTDB)
-      }.should raise_error(RestClient::Request::RequestFailed)
+
+    it 'should PUT the database and raise an error' do
+      lambda do
+        @couch_rest.create_db(TestDatabase)
+      end.should raise_error(RestClient::Request::RequestFailed)
     end
   end
-
 end

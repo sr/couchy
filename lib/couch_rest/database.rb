@@ -1,82 +1,64 @@
 require 'cgi'
-require "base64"
+require 'base64'
 
 module CouchRest
   class Database
-    attr_accessor :host, :name
+    attr_accessor :server, :name
 
-    def initialize(host, name)
-      @name = name
-      @host = host
-      @root = "#{host}/#{name}"
+    def initialize(server, database_name)
+      @name = database_name
+      @server = server
     end
     
-    def to_s
-      @root
-    end
-    
-    def documents(params=nil)
-      url = CouchRest.paramify_url("#{@root}/_all_docs", params)
-      CouchRest.get(url)
+    def documents(params={})
+      server.get("#{name}/_all_docs", params)
     end
   
-    def temp_view(funcs, params=nil)
-      url = CouchRest.paramify_url("#{@root}/_temp_view", params)
-      CouchRest.json(RestClient.post(url, funcs.to_json, 'Content-Type' => 'application/json'))
+    def temp_view(function, params={})
+      server.post("#{name}/_temp_view", params, function, {'Content-Type' => 'application/json'})
     end
   
-    def view(name, params=nil)
-      url = CouchRest.paramify_url "#{@root}/_view/#{name}", params
-      CouchRest.get url
+    def view(view_name, params={})
+      server.get("#{name}/_view/#{view_name}", params)
     end
 
-    # experimental
-    def search(params=nil)
-      url = CouchRest.paramify_url "#{@root}/_search", params
-      CouchRest.get url
+    def search(params={})
+      server.get(URI.join(name, '_search'), params)
     end
 
-    # experimental
-    def action(action, params=nil)
-      url = CouchRest.paramify_url "#{@root}/_action/#{action}", params
-      CouchRest.get url
+    def action(action, params={})
+      server.get(URI.join(name, '_action', action), params)
     end
     
     def get(id)
-      slug = CGI.escape(id) 
-      CouchRest.get "#{@root}/#{slug}"
+      server.get("/#{name}/#{CGI.escape(id)}")
     end
     
-    def fetch_attachment(doc, name)
-      doc = CGI.escape(doc)
-      name = CGI.escape(name)
-      RestClient.get "#{@root}/#{doc}/#{name}"
+    def fetch_attachment(document_id, attachment_name)
+      server.get("#{name}/#{CGI.escape(document_id)}/#{CGI.escape(attachment_name)}", :no_json => true)
     end
     
-    # PUT or POST depending on presence of _id attribute
     def save(doc)
       if doc['_attachments']
         doc['_attachments'] = encode_attachments(doc['_attachments'])
       end
       if doc['_id']
-        slug = CGI.escape(doc['_id'])
-        CouchRest.put "#{@root}/#{slug}", doc
+        server.put("/#{name}/#{CGI.escape(doc['_id'])}", doc)
       else
-        CouchRest.post "#{@root}", doc
+        server.post("/#{name}", {}, doc)
       end
     end
     
     def bulk_save(docs)
-      CouchRest.post "#{@root}/_bulk_docs", {:docs => docs}
+      server.post("#{name}/_bulk_docs", {}, {:docs => docs})
     end
     
     def delete(doc)
-      slug = CGI.escape(doc['_id'])
-      CouchRest.delete "#{@root}/#{slug}?rev=#{doc['_rev']}"
+      server.delete "#{name}/#{CGI.escape(doc['_id'])}?rev=#{doc['_rev']}"
     end
     
     def delete!
-      CouchRest.delete @root
+      server.delete(name)
     end
 
     private
