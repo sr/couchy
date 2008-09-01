@@ -1,12 +1,4 @@
-require 'rubygems'
-require 'test/spec'
-require 'mocha'
-
-require File.dirname(__FILE__) + '/../lib/couch_rest'
-
-CouchHost = 'http://0.0.0.0:5984'
-TestDatabase = 'couchrest-test'
-
+require File.dirname(__FILE__) + '/test_helper'
 
 describe 'Database' do
   before(:each) do
