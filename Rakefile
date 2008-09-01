@@ -2,6 +2,8 @@ require 'rake'
 require 'spec/rake/spectask'
 require 'rcov/rcovtask'
 
+task :default => :test
+
 desc "Run all specs"
 Spec::Rake::SpecTask.new('spec') do |t|
 	t.spec_files = FileList['spec/*_spec.rb']
@@ -13,7 +15,9 @@ Spec::Rake::SpecTask.new(:doc) do |t|
 	t.spec_files = FileList['spec/*_spec.rb']
 end
 
-task :default => :spec
+task :test do
+  sh 'testrb test/*.rb'
+end
 
 task :coverage => :"coverage:verify"
 Rcov::RcovTask.new('coverage:generate') do |t|
