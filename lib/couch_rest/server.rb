@@ -31,16 +31,16 @@ module CouchRest
       post "#{@uri}/_restart", {}
     end
 
-    def put(uri, doc=nil)
-      payload = doc.to_json if doc
-      json RestClient.put(URI.join(server_uri, uri).to_s, payload)
-    end
-
     def get(uri, params={})
       need_json = !params.delete(:no_json)
       uri = paramify_url(uri, params)
       response = RestClient.get(URI.join(server_uri, uri).to_s)
       need_json ? json(response, :max_nesting => false) : response
+    end
+
+    def put(uri, doc=nil)
+      payload = doc.to_json if doc
+      json RestClient.put(URI.join(server_uri, uri).to_s, payload)
     end
 
     def post(uri, params, *args)

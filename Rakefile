@@ -21,8 +21,7 @@ end
 
 task :coverage => :"coverage:verify"
 Rcov::RcovTask.new('coverage:generate') do |t|
-  t.rcov_opts << '--no-html'
-  t.test_files = FileList['spec/*_spec.rb']
+  t.test_files = FileList['test/*_test.rb']
   t.rcov_opts << '-Ilib'
   t.rcov_opts << '-x"home"'
   t.verbose = true
