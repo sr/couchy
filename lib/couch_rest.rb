@@ -4,6 +4,8 @@ require 'rest_client'
 
 $:.unshift File.dirname(__FILE__) + '/couch_rest'
 
+require 'core_ext'
+
 module CouchRest
   autoload :Server,       'server'
   autoload :Database,     'database'

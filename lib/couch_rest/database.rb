@@ -15,7 +15,8 @@ module CouchRest
     end
   
     def temp_view(function, params={})
-      server.post("#{name}/_temp_view", params, function, {'Content-Type' => 'application/json'})
+      server.post("#{name}/_temp_view", function,
+        params.merge!(:headers => {'Content-Type' => 'application/json'}))
     end
   
     def view(view_name, params={})
@@ -45,12 +46,12 @@ module CouchRest
       if doc['_id']
         server.put("/#{name}/#{CGI.escape(doc['_id'])}", doc)
       else
-        server.post("/#{name}", {}, doc)
+        server.post("/#{name}", doc)
       end
     end
     
     def bulk_save(docs)
-      server.post("#{name}/_bulk_docs", {}, {:docs => docs})
+      server.post("#{name}/_bulk_docs", {:docs => docs})
     end
     
     def delete(doc)

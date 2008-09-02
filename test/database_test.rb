@@ -28,17 +28,18 @@ describe 'Database' do
 
   describe 'Creating a temporary view' do
     it 'POST name/_temp_view with given fonction' do
-      @server.expects(:post).with(TestDatabase + '/_temp_view', anything, 'function(doc){emit(null, doc);}', anything)
+      @server.expects(:post).with(TestDatabase + '/_temp_view', 'function(doc){emit(null, doc);}', anything)
       @database.temp_view('function(doc){emit(null, doc);}')
     end
 
     it 'passes parameters around if necessary' do
-      @server.expects(:post).with(anything, {:startkey => 'foo'}, anything, anything)
+      @server.expects(:post).with(anything, 'foo', has_entries(:startkey => 'foo'))
       @database.temp_view('foo', :startkey => 'foo')
     end
 
     it 'POST with application/json Content-Type' do
-      @server.expects(:post).with(anything, anything, anything, {'Content-Type' => 'application/json'})
+      @server.expects(:post).with(anything, anything,
+        has_entries(:headers => {'Content-Type' => 'application/json'}))
       @database.temp_view('foo')
     end
   end

@@ -31,10 +31,9 @@ module CouchRest
       post "#{@uri}/_restart", {}
     end
 
-    def get(uri, params={})
+    def get(path, params={})
       need_json = !params.delete(:no_json)
-      uri = paramify_url(uri, params)
-      response = RestClient.get(URI.join(server_uri, uri).to_s)
+      response = RestClient.get(server_uri.to_uri(path, params).to_s)
       need_json ? json(response, :max_nesting => false) : response
     end
 
@@ -43,12 +42,10 @@ module CouchRest
       json RestClient.put(URI.join(server_uri, uri).to_s, payload)
     end
 
-    def post(uri, params, *args)
-      doc = args.first
-      headers = args.last if args.length > 1
-      uri = URI.join(server_uri, paramify_url(uri.to_s, params)).to_s
+    def post(path, doc=nil, params={})
+      headers = params.delete(:headers)
       payload = doc.to_json if doc
-      json(RestClient.post(uri, payload, headers))
+      json(RestClient.post(server_uri.to_uri(path, params).to_s, payload, headers))
     end
 
     def delete(uri)
