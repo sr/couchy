@@ -23,14 +23,6 @@ module CouchRest
       server.get("#{name}/_view/#{view_name}", params)
     end
 
-    def search(params={})
-      server.get(URI.join(name, '_search'), params)
-    end
-
-    def action(action, params={})
-      server.get(URI.join(name, '_action', action), params)
-    end
-    
     def get(id)
       server.get("/#{name}/#{CGI.escape(id)}")
     end

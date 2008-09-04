@@ -55,10 +55,4 @@ describe 'Database' do
       @database.view('my-view', :count => 100)
     end
   end
-
-  describe 'Issuing a search' do
-  end
-
-  describe 'Issuing an action' do
-  end
 end
