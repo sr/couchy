@@ -55,4 +55,16 @@ describe 'Database' do
       @database.view('my-view', :count => 100)
     end
   end
+
+  describe 'Getting a document' do
+    it 'GET name/id' do
+      @server.expects(:get).with("#{TestDatabase}/foobar")
+      @database.get('foobar')
+    end
+
+    it 'should encode the document id' do
+      CGI.expects(:escape).with('foobar')
+      @database.get('foobar')
+    end
+  end
 end

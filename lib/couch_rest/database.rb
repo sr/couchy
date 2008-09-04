@@ -24,7 +24,7 @@ module CouchRest
     end
 
     def get(id)
-      server.get("/#{name}/#{CGI.escape(id)}")
+      server.get("#{name}/#{CGI.escape(id)}")
     end
     
     def fetch_attachment(document_id, attachment_name)
