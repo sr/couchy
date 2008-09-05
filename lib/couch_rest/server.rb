@@ -55,16 +55,5 @@ module CouchRest
     def json(json_string, options={})
       JSON.parse(json_string, options)
     end
-
-    def paramify_url(url, params = nil)
-      if params
-        query = params.collect do |k,v|
-          v = v.to_json if %w{key startkey endkey}.include?(k.to_s)
-          "#{k}=#{CGI.escape(v.to_s)}"
-        end.join("&")
-        url = "#{url}?#{query}"
-      end
-      url
-    end
   end
 end
