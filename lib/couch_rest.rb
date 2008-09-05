@@ -12,7 +12,7 @@ module CouchRest
   autoload :Pager,        'pager'
   autoload :FileManager,  'file_manager'
 
-  def self.new(uri='http://localhost:5984')
-    Server.new(uri)
+  def self.new(server_uri)
+    Server.new(server_uri)
   end
 end
