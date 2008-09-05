@@ -36,9 +36,9 @@ module CouchRest
         doc['_attachments'] = encode_attachments(doc['_attachments'])
       end
       if doc['_id']
-        server.put("/#{name}/#{CGI.escape(doc['_id'])}", doc)
+        server.put("#{name}/#{CGI.escape(doc['_id'])}", doc)
       else
-        server.post("/#{name}", doc)
+        server.post("#{name}", doc)
       end
     end
     
