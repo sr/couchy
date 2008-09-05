@@ -1,6 +1,10 @@
 require File.dirname(__FILE__) + '/test_helper'
 
 describe 'Server' do
+  setup do
+    @server = CouchRest::Server.new
+  end
+
   specify 'server uri default to http://localhost:5984' do
     server = CouchRest::Server.new
     server.server_uri.should.equal 'http://localhost:5984'
@@ -11,11 +15,14 @@ describe 'Server' do
     server.server_uri.should.equal 'foo'
   end
 
-  describe 'HTTP requests' do
-    setup do
-      @server = CouchRest::Server.new
+  describe '#json' do
+    it 'parse the given json with the given options' do
+      JSON.expects(:parse).with('foo', :bar => :spam)
+      @server.json('foo', :bar => :spam)
     end
+  end
 
+  describe 'HTTP requests' do
     describe 'GET' do
       it 'prepends server URI to given path' do
         @server.stubs(:json).returns('')
@@ -69,6 +76,74 @@ describe 'Server' do
         RestClient.expects(:post).with(anything, anything, {'Content-Type' => 'application/json'})
         @server.post('foo', nil, :headers => {'Content-Type' => 'application/json'})
       end
+    end
+
+    describe 'PUT' do
+      it 'prepends server URI to given path' do
+        @server.stubs(:json).returns('')
+        RestClient.expects(:put).with('http://localhost:5984/a/b', nil, nil)
+        @server.put('a/b')
+      end
+
+      it 'jsonify and post the given document' do
+        @server.stubs(:json)
+        doc = {:foo => 'bar'}
+        doc.expects(:to_json).returns('some json')
+        RestClient.expects(:put).with('http://localhost:5984/foo', 'some json')
+        @server.put('foo', doc)
+      end
+    end
+
+    describe 'DELETE' do
+      it 'prepends server URI to given path' do
+        @server.stubs(:json).returns('')
+        RestClient.expects(:delete).with('http://localhost:5984/a/b', nil, nil)
+        @server.delete('a/b')
+      end
+    end
+  end
+
+  describe 'Getting a list of all the databases' do
+    it 'GET _all_dbs' do
+      @server.expects(:get).with('_all_dbs')
+      @server.databases
+    end
+  end
+
+  describe 'Getting a database' do
+    it 'creates a new Database object with the given name and itselfs' do
+      CouchRest::Database.expects(:new).with(@server, 'mydb')
+      @server.database('mydb')
+    end
+
+    it 'returns a Database' do
+      @server.database('mydb').should.be.an.instance_of CouchRest::Database
+    end
+  end
+
+  describe 'Getting info on the server' do
+    it 'GET the server URI' do
+      @server.expects(:get).with('/')
+      @server.info
+    end
+  end
+
+  describe 'Restarting the server' do
+    it 'POST _restart' do
+      @server.expects(:post).with('_restart')
+      @server.restart!
+    end
+  end
+
+  describe 'Creating a new database' do
+    it 'PUT to database_name' do
+      @server.expects(:put).with('mydb')
+      @server.create_db('mydb')
+    end
+
+    it 'returns a Database' do
+      @server.stubs(:put)
+      @server.create_db('mydb').should.be.an.instance_of CouchRest::Database
     end
   end
 end

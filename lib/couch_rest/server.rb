@@ -23,12 +23,12 @@ module CouchRest
 
     # get the welcome message
     def info
-      get "#{@uri}/"
+      get '/'
     end
 
     # restart the couchdb instance
     def restart!
-      post "#{@uri}/_restart", {}
+      post '_restart'
     end
 
     def get(path, params={})
@@ -37,9 +37,9 @@ module CouchRest
       need_json ? json(response, :max_nesting => false) : response
     end
 
-    def put(uri, doc=nil)
+    def put(path, doc=nil)
       payload = doc.to_json if doc
-      json RestClient.put(URI.join(server_uri, uri).to_s, payload)
+      json RestClient.put(server_uri.to_uri(path).to_s, payload)
     end
 
     def post(path, doc=nil, params={})
@@ -48,8 +48,8 @@ module CouchRest
       json(RestClient.post(server_uri.to_uri(path, params).to_s, payload, headers))
     end
 
-    def delete(uri)
-      json RestClient.delete(URI.join(server_uri, uri).to_s)
+    def delete(path)
+      json RestClient.delete(server_uri.to_uri(path).to_s)
     end
 
     def json(json_string, options={})
