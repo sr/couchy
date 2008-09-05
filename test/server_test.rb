@@ -15,11 +15,9 @@ describe 'Server' do
     server.uri.to_s.should.equal 'foo'
   end
 
-  describe '#json' do
-    it 'parse the given json with the given options' do
-      JSON.expects(:parse).with('foo', :bar => :spam)
-      @server.json('foo', :bar => :spam)
-    end
+  specify '#json parse the given json string with the given options' do
+    JSON.expects(:parse).with('foo', :bar => :spam)
+    @server.send(:json, 'foo', :bar => :spam)
   end
 
   describe 'HTTP requests' do

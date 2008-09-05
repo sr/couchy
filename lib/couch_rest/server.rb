@@ -41,15 +41,11 @@ module CouchRest
     def post(path, doc=nil, params={})
       headers = params.delete(:headers)
       payload = doc.to_json if doc
-      json(RestClient.post(uri_for(path, params), payload, headers))
+      json RestClient.post(uri_for(path, params), payload, headers)
     end
 
     def delete(path)
       json RestClient.delete(uri_for(path))
-    end
-
-    def json(json_string, options={})
-      JSON.parse(json_string, options)
     end
 
     private
@@ -57,6 +53,10 @@ module CouchRest
         uri.join(path).tap do |uri|
           uri.query_values = params.stringify_keys_and_jsonify_values! if params.any?
         end.to_s
+      end
+
+      def json(json_string, options={})
+        JSON.parse(json_string, options)
       end
   end
 end
