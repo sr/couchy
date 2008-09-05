@@ -1,12 +1,19 @@
 module CouchRest
   class Server
-    attr_accessor :server_uri
+    attr_accessor :uri
 
-    def initialize(server='http://localhost:5984')
-      @server_uri = server
+    def initialize(uri='http://localhost:5984')
+      @uri = Addressable::URI.parse(uri)
     end
 
-    # list all databases on the server
+    def info
+      get '/'
+    end
+
+    def restart!
+      post '_restart'
+    end
+
     def databases
       get('_all_dbs')
     end
@@ -15,45 +22,41 @@ module CouchRest
       Database.new(self, name)
     end
   
-    # create a database
     def create_db(name)
       put(name)
       database(name)
     end
 
-    # get the welcome message
-    def info
-      get '/'
-    end
-
-    # restart the couchdb instance
-    def restart!
-      post '_restart'
-    end
-
     def get(path, params={})
       need_json = !params.delete(:no_json)
-      response = RestClient.get(server_uri.to_uri(path, params).to_s)
+      response = RestClient.get(uri_for(path, params))
       need_json ? json(response, :max_nesting => false) : response
     end
 
     def put(path, doc=nil)
       payload = doc.to_json if doc
-      json RestClient.put(server_uri.to_uri(path).to_s, payload)
+      json RestClient.put(uri_for(path), payload)
     end
 
     def post(path, doc=nil, params={})
       headers = params.delete(:headers)
       payload = doc.to_json if doc
-      json(RestClient.post(server_uri.to_uri(path, params).to_s, payload, headers))
+      json(RestClient.post(uri_for(path, params), payload, headers))
     end
 
     def delete(path)
-      json RestClient.delete(server_uri.to_uri(path).to_s)
+      json RestClient.delete(uri_for(path))
     end
 
     def json(json_string, options={})
       JSON.parse(json_string, options)
     end
+
+    private
+      def uri_for(path, params={})
+        uri.join(path).tap do |uri|
+          uri.query_values = params.stringify_keys_and_jsonify_values! if params.any?
+        end.to_s
+      end
   end
 end

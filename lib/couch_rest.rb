@@ -1,6 +1,7 @@
 require 'rubygems'
 require 'json'
 require 'rest_client'
+require 'addressable/uri'
 
 $:.unshift File.dirname(__FILE__) + '/couch_rest'
 

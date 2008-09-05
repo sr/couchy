@@ -5,14 +5,14 @@ describe 'Server' do
     @server = CouchRest::Server.new
   end
 
-  specify 'server uri default to http://localhost:5984' do
+  specify 'uri default to http://localhost:5984' do
     server = CouchRest::Server.new
-    server.server_uri.should.equal 'http://localhost:5984'
+    server.uri.to_s.should.equal 'http://localhost:5984'
   end
 
-  it 'has an accessor on the server uri' do
+  it 'has an accessor on its uri' do
     server = CouchRest::Server.new('foo')
-    server.server_uri.should.equal 'foo'
+    server.uri.to_s.should.equal 'foo'
   end
 
   describe '#json' do
