@@ -20,82 +20,83 @@ describe 'Server' do
     @server.send(:json, 'foo', :bar => :spam)
   end
 
-  describe 'HTTP requests' do
+  describe 'HTTP requests utility methods' do
     describe 'GET' do
-      it 'prepends server URI to given path' do
-        @server.stubs(:json).returns('')
+      it "appends the given path to the server's URI" do
+        @server.stubs(:json)
         RestClient.expects(:get).with('http://localhost:5984/foo/bar')
         @server.get('foo/bar')
       end
 
-      it 'appends params as query string' do
+      it 'appends the given parameters as the query string' do
         @server.stubs(:json)
         RestClient.expects(:get).with('http://localhost:5984/foo?bar=spam')
         @server.get('foo', :bar => 'spam')
       end
 
-      it 'parse the result as json with :max_nesting set to false' do
-        RestClient.expects(:get).returns('some json')
-        @server.expects(:json).with('some json', :max_nesting => false).returns('some json')
+      it 'parses the server response as json with :max_nesting set to false' do
+        RestClient.stubs(:get).returns('some json')
+        @server.expects(:json).with('some json', :max_nesting => false).returns([])
         @server.get('give_me_some_json')
       end
 
       it 'do not parse the result as json if :no_json is specified' do
-        RestClient.stubs(:get).returns('foo')
-        @server.expects(:json).with('foo', anything).never
-        @server.get('bar', :no_json => true)
+        RestClient.stubs(:get)
+        @server.expects(:json).never
+        @server.get('foo', :no_json => true)
       end
     end
 
     describe 'POST' do
-      it 'prepends server URI to given path' do
-        @server.stubs(:json).returns('')
-        RestClient.expects(:post).with('http://localhost:5984/a/b', nil, nil)
+      setup do
+        @server.stubs(:json)
+      end
+
+      it "appends the given path to server's URI" do
+        RestClient.expects(:post).with('http://localhost:5984/a/b', nil, anything)
         @server.post('a/b')
       end
 
-      it 'appends given parameters as the query string of the URI' do
-        @server.stubs(:json).returns('')
-        RestClient.expects(:post).with('http://localhost:5984/foo?bar=spam', nil, nil)
+      it 'appends the given parameters as the query string' do
+        RestClient.expects(:post).with('http://localhost:5984/foo?bar=spam', nil, anything)
         @server.post('foo', nil, :bar => 'spam')
       end
 
-      it 'jsonify and post the given document' do
-        doc = {:foo => 'bar'}
-        @server.stubs(:json).returns('')
-        doc.expects(:to_json).returns('some json')
-        RestClient.expects(:post).with('http://localhost:5984/foo', 'some json', nil).
-          returns([:a,:b].to_json)
-        @server.post('foo', doc)
+      it 'jsonify the given body and post it' do
+        body = {:foo => 'bar'}
+        body.expects(:to_json).returns('some json')
+        RestClient.expects(:post).with(anything, 'some json', anything)
+        @server.post('foo', body)
       end
 
       it 'passes given headers to RestClient' do
-        @server.stubs(:json).returns('')
         RestClient.expects(:post).with(anything, anything, {'Content-Type' => 'application/json'})
         @server.post('foo', nil, :headers => {'Content-Type' => 'application/json'})
       end
     end
 
     describe 'PUT' do
-      it 'prepends server URI to given path' do
-        @server.stubs(:json).returns('')
-        RestClient.expects(:put).with('http://localhost:5984/a/b', nil, nil)
+      setup do
+        @server.stubs(:json)
+      end
+
+      it "appends the given path to the server's URI" do
+        RestClient.expects(:put).with('http://localhost:5984/a/b', anything)
         @server.put('a/b')
       end
 
-      it 'jsonify and post the given document' do
-        @server.stubs(:json)
-        doc = {:foo => 'bar'}
-        doc.expects(:to_json).returns('some json')
-        RestClient.expects(:put).with('http://localhost:5984/foo', 'some json')
-        @server.put('foo', doc)
+      it 'jsonify and PUT the given body' do
+        body = {:foo => 'bar'}
+        body.expects(:to_json).returns('some json')
+        RestClient.expects(:put).with(anything, 'some json')
+        @server.put('foo', body)
       end
     end
 
     describe 'DELETE' do
-      it 'prepends server URI to given path' do
+      it "appends the given path to the server's URI" do
         @server.stubs(:json).returns('')
-        RestClient.expects(:delete).with('http://localhost:5984/a/b', nil, nil)
+        RestClient.expects(:delete).with('http://localhost:5984/a/b')
         @server.delete('a/b')
       end
     end
@@ -114,7 +115,7 @@ describe 'Server' do
       @server.database('mydb')
     end
 
-    it 'returns a Database' do
+    it 'returns a Database object' do
       @server.database('mydb').should.be.an.instance_of CouchRest::Database
     end
   end
@@ -139,7 +140,7 @@ describe 'Server' do
       @server.create_db('mydb')
     end
 
-    it 'returns a Database' do
+    it 'returns a Database object' do
       @server.stubs(:put)
       @server.create_db('mydb').should.be.an.instance_of CouchRest::Database
     end

@@ -15,7 +15,7 @@ module CouchRest
     end
 
     def databases
-      get('_all_dbs')
+      get '_all_dbs'
     end
   
     def database(name)
@@ -33,15 +33,15 @@ module CouchRest
       need_json ? json(response, :max_nesting => false) : response
     end
 
-    def put(path, doc=nil)
-      payload = doc.to_json if doc
-      json RestClient.put(uri_for(path), payload)
-    end
-
     def post(path, doc=nil, params={})
       headers = params.delete(:headers)
       payload = doc.to_json if doc
       json RestClient.post(uri_for(path, params), payload, headers)
+    end
+
+    def put(path, doc=nil)
+      payload = doc.to_json if doc
+      json RestClient.put(uri_for(path), payload)
     end
 
     def delete(path)
