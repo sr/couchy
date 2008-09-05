@@ -47,7 +47,17 @@ module CouchRest
     end
     
     def delete(doc)
-      server.delete "#{name}/#{CGI.escape(doc['_id'])}?rev=#{doc['_rev']}"
+      case doc
+      when String
+        server.delete "#{name}/#{CGI.escape(doc)}"
+      when Hash
+        raise ArgumentError unless doc['_id']
+        path = "#{name}/#{CGI.escape(doc['_id'])}"
+        path << "?rev=#{doc['_rev']}" if doc['_rev']
+        server.delete path
+      else
+        raise ArgumentError
+      end
     end
     
     def delete!
