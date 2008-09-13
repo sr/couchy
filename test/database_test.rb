@@ -14,6 +14,10 @@ describe 'Database' do
     @database.server.should.equal @server
   end
 
+  specify '#base64 removes new lines to workaround <https://issues.apache.org/jira/browse/COUCHDB-19>' do
+    @database.send(:base64, 'foo').should.equal 'Zm9v'
+  end
+
   describe 'Getting a list of documents' do
     it 'GET $database_name/_all_docs' do
       @server.expects(:get).with(TestDatabase + '/_all_docs', {})
