@@ -2,7 +2,7 @@ module CouchRest
   class Server
     attr_accessor :uri
 
-    def initialize(uri='http://localhost:5984')
+    def initialize(uri)
       @uri = Addressable::URI.parse(uri)
     end
 

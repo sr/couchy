@@ -2,12 +2,7 @@ require File.dirname(__FILE__) + '/test_helper'
 
 describe 'Server' do
   setup do
-    @server = CouchRest::Server.new
-  end
-
-  specify 'uri default to http://localhost:5984' do
-    server = CouchRest::Server.new
-    server.uri.to_s.should.equal 'http://localhost:5984'
+    @server = CouchRest::Server.new('http://localhost:5984')
   end
 
   it 'has an accessor on its uri' do
