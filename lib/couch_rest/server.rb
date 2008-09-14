@@ -6,22 +6,39 @@ module CouchRest
       @uri = Addressable::URI.parse(uri)
     end
 
+    # Get information about the server
+    #
+    # @return [Hash] Informations about the server
     def info
       get '/'
     end
 
+    # Restarts the server
+    #
+    # @return [Hash] Request result
     def restart!
       post '_restart'
     end
 
+    # Get a list of all databases available on the server
+    #
+    # @return [Array] List of databases
     def databases
       get '_all_dbs'
     end
   
+    # Get a database
+    #
+    # @param [String] name Database's name
+    # @return [CouchRest::Database] The database
     def database(name)
       Database.new(self, name)
     end
   
+    # Create a database
+    #
+    # @param [String] name Database's name
+    # @return [CouchRest::Database] The newly created database
     def create_db(name)
       put(name)
       database(name)

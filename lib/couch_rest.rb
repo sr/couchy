@@ -13,6 +13,10 @@ module CouchRest
   autoload :Pager,        'pager'
   autoload :FileManager,  'file_manager'
 
+  # Shortcut for CouchRest::Server.new
+  #
+  # @param [String] server_uri The URI of the CouchDB server. defaults to "http://localhost:5984"
+  # @return CouchRest::Server
   def self.new(server_uri='http://localhost:5984')
     Server.new(server_uri)
   end
