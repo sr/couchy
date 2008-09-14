@@ -1,6 +1,7 @@
 require 'rake'
 require 'spec/rake/spectask'
 require 'rcov/rcovtask'
+require 'yard'
 
 task :default => :test
 
@@ -26,3 +27,5 @@ Rcov::RcovTask.new('coverage:generate') do |t|
   t.rcov_opts << '-x"home"'
   t.verbose = true
 end
+
+YARD::Rake::YardocTask.new
