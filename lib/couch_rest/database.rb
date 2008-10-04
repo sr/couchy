@@ -53,9 +53,8 @@ module CouchRest
     #
     # @param [Hash] doc The document
     def save(doc)
-      if doc['_attachments']
-        doc['_attachments'] = encode_attachments(doc['_attachments'])
-      end
+      doc['_attachments'] = encode_attachments(doc['_attachments']) if doc['_attachments']
+
       if doc['_id']
         server.put("#{name}/#{CGI.escape(doc['_id'])}", doc)
       else
@@ -95,7 +94,7 @@ module CouchRest
 
     private
       def encode_attachments(attachments)
-        attachments.each do |k,v|
+        attachments.each do |k, v|
           next if v['stub']
           v['data'] = base64(v['data'])
         end
