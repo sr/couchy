@@ -84,7 +84,14 @@ describe CouchRest::Database do
         "_id" => "_design/first", 
         :views => {
           :test => {
-            :map => "function(doc){for(var w in doc){ if(!w.match(/^_/))emit(w,doc[w])}}"
+            :map => <<-eoj
+              function(doc) {
+                for(var w in doc) {
+                  if(!w.match(/^_/))
+                    emit(w,doc[w])
+                } 
+              }
+            eoj
             }
           }
         })

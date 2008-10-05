@@ -68,12 +68,20 @@ module CouchRest
     private
       def uri_for(path, params={})
         uri.join(path).tap do |uri|
-          uri.query_values = params.stringify_keys_and_jsonify_values! if params.any?
+          uri.query_values = stringify_keys_and_jsonify_values(params) if params.any?
         end.to_s
       end
 
       def json(json_string, options={})
         JSON.parse(json_string, options)
+      end
+
+      def stringify_keys_and_jsonify_values(hash)
+        hash.inject({}) do |memo, (key, value)|
+          value = value.to_json if %w(key startkey endkey).include?(key.to_s)
+          memo[key.to_s] = value.to_s
+          memo
+        end
       end
   end
 end
