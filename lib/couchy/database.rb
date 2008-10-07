@@ -1,7 +1,7 @@
 require 'cgi'
 require 'base64'
 
-module CouchRest
+module Couchy
   class Database
     attr_accessor :server, :name
 

@@ -1,9 +1,9 @@
 require File.dirname(__FILE__) + '/spec_helper'
-require File.dirname(__FILE__) + '/../lib/couch_rest'
+require File.dirname(__FILE__) + '/../lib/couchy'
 
-describe CouchRest do
+describe Couchy do
   before(:each) do
-    @couch_rest = CouchRest.new(CouchHost)
+    @couch_rest = Couchy.new(CouchHost)
     @database = @couch_rest.database(TestDatabase)
   end
 
@@ -33,7 +33,7 @@ describe CouchRest do
   describe 'initializing a database' do
     it 'should return a database' do
       db = @couch_rest.database(TestDatabase)
-      db.should be_an_instance_of(CouchRest::Database)
+      db.should be_an_instance_of(Couchy::Database)
     end
   end
 
@@ -44,7 +44,7 @@ describe CouchRest do
 
     it 'should return the created database' do
       db = @couch_rest.create_db(TestDatabase)
-      db.should be_an_instance_of(CouchRest::Database)
+      db.should be_an_instance_of(Couchy::Database)
     end
 
     it 'should create the database' do

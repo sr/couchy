@@ -1,4 +1,4 @@
-module CouchRest
+module Couchy
   class Server
     attr_accessor :uri
 
@@ -30,7 +30,7 @@ module CouchRest
     # Get a database
     #
     # @param [String] name Database's name
-    # @return [CouchRest::Database] The database
+    # @return [Couchy::Database] The database
     def database(name)
       Database.new(self, name)
     end
@@ -38,7 +38,7 @@ module CouchRest
     # Create a database
     #
     # @param [String] name Database's name
-    # @return [CouchRest::Database] The newly created database
+    # @return [Couchy::Database] The newly created database
     def create_db(name)
       put(name)
       database(name)

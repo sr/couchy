@@ -2,11 +2,11 @@ require File.dirname(__FILE__) + '/test_helper'
 
 describe 'Server' do
   setup do
-    @server = CouchRest::Server.new('http://localhost:5984')
+    @server = Couchy::Server.new('http://localhost:5984')
   end
 
   it 'has an accessor on its uri' do
-    server = CouchRest::Server.new('foo')
+    server = Couchy::Server.new('foo')
     server.uri.to_s.should.equal 'foo'
   end
 
@@ -106,12 +106,12 @@ describe 'Server' do
 
   describe 'Getting a database' do
     it 'creates a new Database object with the given name and itselfs' do
-      CouchRest::Database.expects(:new).with(@server, 'mydb')
+      Couchy::Database.expects(:new).with(@server, 'mydb')
       @server.database('mydb')
     end
 
     it 'returns a Database object' do
-      @server.database('mydb').should.be.an.instance_of CouchRest::Database
+      @server.database('mydb').should.be.an.instance_of Couchy::Database
     end
   end
 
@@ -137,7 +137,7 @@ describe 'Server' do
 
     it 'returns a Database object' do
       @server.stubs(:put)
-      @server.create_db('mydb').should.be.an.instance_of CouchRest::Database
+      @server.create_db('mydb').should.be.an.instance_of Couchy::Database
     end
   end
 end

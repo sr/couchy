@@ -3,7 +3,7 @@ require File.dirname(__FILE__) + '/test_helper'
 describe 'Database' do
   before(:each) do
     @server = stub('server', :get => '', :post => '', :put => '', :delete => '')
-    @database = CouchRest::Database.new(@server, TestDatabase)
+    @database = Couchy::Database.new(@server, TestDatabase)
   end
 
   it 'has an accessor on its name' do

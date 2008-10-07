@@ -3,18 +3,18 @@ require 'json'
 require 'rest_client'
 require 'addressable/uri'
 
-$:.unshift File.dirname(__FILE__) + '/couch_rest'
+$:.unshift File.dirname(__FILE__) + '/couchy'
 
 require 'core_ext'
 
-module CouchRest
+module Couchy
   autoload :Server,       'server'
   autoload :Database,     'database'
 
-  # Shortcut for CouchRest::Server.new
+  # Shortcut for Couchy::Server.new
   #
   # @param [String] server_uri The URI of the CouchDB server. defaults to "http://localhost:5984/"
-  # @return CouchRest::Server
+  # @return Couchy::Server
   def self.new(server_uri='http://localhost:5984/')
     Server.new(server_uri)
   end

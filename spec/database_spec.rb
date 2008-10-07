@@ -1,9 +1,9 @@
 require File.dirname(__FILE__) + '/spec_helper'
-require File.dirname(__FILE__) + '/../lib/couch_rest'
+require File.dirname(__FILE__) + '/../lib/couchy'
 
-describe CouchRest::Database do
+describe Couchy::Database do
   before(:each) do
-    @couch_rest = CouchRest.new(CouchHost)
+    @couch_rest = Couchy.new(CouchHost)
     @database = @couch_rest.database(TestDatabase).delete! rescue nil
     @database = @couch_rest.create_db(TestDatabase)
   end
@@ -398,14 +398,14 @@ describe CouchRest::Database do
   
   describe "deleting a database" do
     it "should start with the test database" do
-      @couch_rest.databases.should include('couchrest-test')
+      @couch_rest.databases.should include('couchy-test')
     end
     it "should delete the database" do
-      db = @couch_rest.database('couchrest-test')
+      db = @couch_rest.database('couchy-test')
       # r = 
       db.delete!
       # r['ok'].should == true
-      @couch_rest.databases.should_not include('couchrest-test')
+      @couch_rest.databases.should_not include('couchy-test')
     end
   end
 end
