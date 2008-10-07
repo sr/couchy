@@ -18,6 +18,13 @@ describe 'Database' do
     @database.send(:base64, 'foo').should.equal 'Zm9v'
   end
 
+  describe 'Deleting itselfs' do
+    it 'DELETE $database_name' do
+      @server.expects(:delete).with(TestDatabase)
+      @database.delete!
+    end
+  end
+
   describe 'Getting a list of documents' do
     it 'GET $database_name/_all_docs' do
       @server.expects(:get).with(TestDatabase + '/_all_docs', {})
@@ -27,36 +34,6 @@ describe 'Database' do
     it 'uses given parameters' do
       @server.expects(:get).with(TestDatabase + '/_all_docs', :startkey => 'somedoc', :count => 3)
       @database.documents(:startkey => 'somedoc', :count => 3)
-    end
-  end
-
-  describe 'Creating a temporary view' do
-    it 'POST $database_name/_temp_view with the given fonction' do
-      @server.expects(:post).with(TestDatabase + '/_temp_view', 'js function', anything)
-      @database.temp_view('js function')
-    end
-
-    it "set the request's Content-Type to application/json" do
-      @server.expects(:post).with(anything, anything,
-        has_entries(:headers => {'Content-Type' => 'application/json'}))
-      @database.temp_view('foo')
-    end
-
-    it 'uses the given parameters' do
-      @server.expects(:post).with(anything, 'foo', has_entries(:startkey => 'foo'))
-      @database.temp_view('foo', :startkey => 'foo')
-    end
-  end
-
-  describe 'Getting a view' do
-    it 'GET $database_name/_view/$view_name' do
-      @server.expects(:get).with("#{TestDatabase}/_view/my-view", {})
-      @database.view('my-view')
-    end
-
-    it 'uses the given parameters' do
-      @server.expects(:get).with(anything, :count => 100)
-      @database.view('my-view', :count => 100)
     end
   end
 
@@ -72,22 +49,7 @@ describe 'Database' do
     end
   end
 
-  describe 'Fetching an attachment' do
-    it 'GET $database_name/$document_id/$attachment_id' do
-      @server.expects(:get).with("#{TestDatabase}/my-doc/foo", anything)
-      @database.fetch_attachment('my-doc', 'foo')
-    end
-
-    it 'escapes the document id and the attachement id' do
-      CGI.expects(:escape).with('my-doc')
-      CGI.expects(:escape).with('foo')
-      @database.fetch_attachment('my-doc', 'foo')
-    end
-  end
-
   describe 'Saving a document' do
-    # TODO: stringify_keys! to accept symbol keys
-
     it 'encodes the attachments if the given document contains any' do
       doc = {'_attachments' => 'foo'}
       doc.expects(:[]=).with('_attachments', 'bar')
@@ -95,7 +57,7 @@ describe 'Database' do
       @database.save(doc)
     end
 
-    it 'POST the document to $database_name when no document id was specified' do
+    it 'POST the document to $database_name when no document id is specified' do
       doc = {:foo => 'bar'}
       @server.expects(:post).with(TestDatabase, doc)
       @database.save(doc)
@@ -122,6 +84,19 @@ describe 'Database' do
     end
   end
 
+  describe 'Fetching an attachment' do
+    it 'GET $database_name/$document_id/$attachment_id' do
+      @server.expects(:get).with("#{TestDatabase}/my-doc/foo", anything)
+      @database.fetch_attachment('my-doc', 'foo')
+    end
+
+    it 'escapes the document id and the attachement id' do
+      CGI.expects(:escape).with('my-doc')
+      CGI.expects(:escape).with('foo')
+      @database.fetch_attachment('my-doc', 'foo')
+    end
+  end
+
   describe 'Deleting a document' do
     describe 'When given the document id' do
       it 'DELETE $database_name/$document_id' do
@@ -137,9 +112,7 @@ describe 'Database' do
 
     describe 'When given an Hash representing a document' do
       it 'raises ArgumentError if it do not have an _id key' do
-        proc do
-          @database.delete('foo' => 'bar')
-        end.should.raise(ArgumentError)
+        lambda { @database.delete('foo' => 'bar') }.should.raise(ArgumentError)
       end
 
       it 'DELETE $database_name/$document_id' do
@@ -159,16 +132,37 @@ describe 'Database' do
     end
 
     it 'raises ArgumentError if the given argument is neither a document id nor a document' do
-      proc do
-        @database.delete(:fooo)
-      end.should.raise(ArgumentError)
+      lambda { @database.delete(:fooo) }.should.raise(ArgumentError)
     end
   end
 
-  describe 'Deleting the database' do
-    it 'DELETE $database_name' do
-      @server.expects(:delete).with(TestDatabase)
-      @database.delete!
+  describe 'Creating a temporary view' do
+    it 'POST $database_name/_temp_view with the given fonction' do
+      @server.expects(:post).with(TestDatabase + '/_temp_view', 'js function', anything)
+      @database.temp_view('js function')
+    end
+
+    it "sets the request's Content-Type to application/json" do
+      @server.expects(:post).with(anything, anything,
+        has_entries(:headers => {'Content-Type' => 'application/json'}))
+      @database.temp_view('foo')
+    end
+
+    it 'uses the given parameters' do
+      @server.expects(:post).with(anything, 'foo', has_entries(:startkey => 'foo'))
+      @database.temp_view('foo', :startkey => 'foo')
+    end
+  end
+
+  describe 'Getting a view' do
+    it 'GET $database_name/_view/$view_name' do
+      @server.expects(:get).with("#{TestDatabase}/_view/my-view", {})
+      @database.view('my-view')
+    end
+
+    it 'uses the given parameters' do
+      @server.expects(:get).with(anything, :count => 100)
+      @database.view('my-view', :count => 100)
     end
   end
 end

@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/test_helper'
 
 describe 'Server' do
   setup do
-    @server = Couchy::Server.new('http://localhost:5984')
+    @server = Couchy::Server.new('http://localhost:5984/')
   end
 
   it 'has an accessor on its uri' do
