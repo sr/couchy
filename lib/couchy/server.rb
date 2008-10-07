@@ -67,9 +67,9 @@ module Couchy
 
     private
       def uri_for(path, params={})
-        uri.join(path).tap do |uri|
-          uri.query_values = stringify_keys_and_jsonify_values(params) if params.any?
-        end.to_s
+        u = uri.join(path)
+        u.query_values = stringify_keys_and_jsonify_values(params) if params.any?
+        u.to_s
       end
 
       def json(json_string, options={})
