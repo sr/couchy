@@ -10,8 +10,6 @@ require 'core_ext'
 module CouchRest
   autoload :Server,       'server'
   autoload :Database,     'database'
-  autoload :Pager,        'pager'
-  autoload :FileManager,  'file_manager'
 
   # Shortcut for CouchRest::Server.new
   #
