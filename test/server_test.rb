@@ -10,9 +10,71 @@ describe 'Server' do
     server.uri.to_s.should.equal 'foo'
   end
 
-  specify '#json parse the given json string with the given options' do
-    JSON.expects(:parse).with('foo', :bar => :spam)
-    @server.send(:json, 'foo', :bar => :spam)
+  describe 'Various utility methods' do
+    setup do
+      Couchy::Server.class_eval { public :uri_for, :json, :stringify_keys_and_jsonify_values }
+      @server = Couchy::Server.new('http://foo.org/')
+    end
+
+    specify '#json parse the given json string with the given options' do
+      JSON.expects(:parse).with('foo', :bar => :spam)
+      @server.send(:json, 'foo', :bar => :spam)
+    end
+
+    describe '#uri_for' do
+      setup do
+        @uri = stub('server uri joined with given path', :query_values= => '')
+        @server.uri.stubs(:join).returns(@uri)
+      end
+
+      it 'joins the given path with the URI of the server' do
+        @server.uri.expects(:join).with('bar/spam')
+        @server.uri_for('bar/spam')
+      end
+
+      it 'stringifys keys and jsonifys values of the given parameters' do
+        @server.expects(:stringify_keys_and_jsonify_values).with(:is => 'awesome').returns({})
+        @server.uri_for('group/home', {:is => 'awesome'})
+      end
+
+      it 'sets the query to the given parameters' do
+        params = {:foo => 'bar'}
+        @uri.expects(:query_values=).with('stringified keys')
+        @server.stubs(:stringify_keys_and_jsonify_values).with(params).returns('stringified keys')
+        @server.uri_for('dj/premier', params)
+      end
+
+      it 'do not set the query if no parameters' do
+        @uri.expects(:query_values=).never
+        @server.uri_for('primo')
+      end
+
+      it 'returns the resulting URI as a string' do
+        @uri.expects(:to_s).returns('resulting uri as a string')
+        @server.uri_for('supa/star').should.equal 'resulting uri as a string'
+      end
+    end
+
+    describe '#stringify_keys_and_jsonify_values' do
+      it 'stringifys keys' do
+        @server.stringify_keys_and_jsonify_values(:foo => 'bar').should.equal('foo' => 'bar')
+      end
+
+      it 'jsonifys value if key is "key"' do
+        @server.stringify_keys_and_jsonify_values(:key => {'foo' => 'bar'}).should.
+          equal('key' => '{"foo":"bar"}')
+      end
+
+      it 'jsonifys value if key is "startkey"' do
+        @server.stringify_keys_and_jsonify_values(:startkey => {'foo' => 'bar'}).should.
+          equal('startkey' => '{"foo":"bar"}')
+      end
+
+      it 'jsonifys value if key is "endkey"' do
+        @server.stringify_keys_and_jsonify_values(:endkey => {'foo' => 'bar'}).should.
+          equal('endkey' => '{"foo":"bar"}')
+      end
+    end
   end
 
   describe 'HTTP requests utility methods' do
