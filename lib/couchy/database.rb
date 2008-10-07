@@ -53,7 +53,7 @@ module Couchy
     #
     # @param [Hash] doc The document
     def save(doc)
-      doc['_attachments'] = encode_attachments(doc['_attachments']) if doc['_attachments']
+      doc = encode_attachments_of(doc)
 
       if doc['_id']
         server.put("#{name}/#{CGI.escape(doc['_id'])}", doc)
@@ -93,16 +93,13 @@ module Couchy
     end
 
     private
-      def encode_attachments(attachments)
-        attachments.each do |k, v|
-          next if v['stub']
-          v['data'] = base64(v['data'])
-        end
-        attachments
+      def encode_attachments_of(doc)
+        return doc unless doc['_attachments']
+        doc['_attachments'].each { |_, v| v.update('data' => base64(v['data'])) } and doc
       end
 
       def base64(data)
-        Base64.encode64(data).gsub(/\s/,'')
+        Base64.encode64(data.to_s).gsub(/\s/,'')
       end
   end
 end

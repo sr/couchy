@@ -18,6 +18,33 @@ describe 'Database' do
     @database.send(:base64, 'foo').should.equal 'Zm9v'
   end
 
+  describe 'Encoding attachments of a document' do
+    setup do
+      Couchy::Database.class_eval { public :encode_attachments_of }
+      @server.stubs(:base64).returns('')
+      @database = Couchy::Database.new(@server, TestDatabase)
+      @attachments = { 'foo' => { 'type' => 'text/plain', 'data' => 'some text' },
+                       'bar' => { 'type' => 'text/plain', 'data' => 'same here' }}
+      @doc = {:foo => 'bar', '_attachments' => @attachments}
+    end
+
+    it 'returns the doc as is if there is no attachment' do
+      @database.encode_attachments_of(:foo => 'bar').should.equal(:foo => 'bar')
+    end
+
+    it 'encodes the data of each attachment in base64' do
+      @database.expects(:base64).with('some text').returns('')
+      @database.expects(:base64).with('same here').returns('')
+      @database.encode_attachments_of(@doc)
+    end
+
+    it 'returns the document with the attachments encoded' do
+      doc = @database.encode_attachments_of(@doc)
+      doc['_attachments']['foo']['data'].should.equal 'c29tZSB0ZXh0'
+      doc['_attachments']['bar']['data'].should.equal 'c2FtZSBoZXJl'
+    end
+  end
+
   describe 'Deleting itselfs' do
     it 'DELETE $database_name' do
       @server.expects(:delete).with(TestDatabase)
@@ -50,10 +77,9 @@ describe 'Database' do
   end
 
   describe 'Saving a document' do
-    it 'encodes the attachments if the given document contains any' do
-      doc = {'_attachments' => 'foo'}
-      doc.expects(:[]=).with('_attachments', 'bar')
-      @database.expects(:encode_attachments).with(doc['_attachments']).returns('bar')
+    it 'encodes attachments of the given document' do
+      doc = {:foo => 'bar'}
+      @database.expects(:encode_attachments_of).with(doc).returns({})
       @database.save(doc)
     end
 

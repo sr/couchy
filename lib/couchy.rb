@@ -5,8 +5,6 @@ require 'addressable/uri'
 
 $:.unshift File.dirname(__FILE__) + '/couchy'
 
-require 'core_ext'
-
 module Couchy
   autoload :Server,       'server'
   autoload :Database,     'database'
