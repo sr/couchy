@@ -6,38 +6,40 @@ module Couchy
       @uri = Addressable::URI.parse(uri)
     end
 
-    # Get information about the server
+    # Gets information about the server
     #
-    # @return [Hash] Informations about the server
+    # @return [Hash] Parsed server response
     def info
       get '/'
     end
 
     # Restarts the server
     #
-    # @return [Hash] Request result
+    # @return [Hash] Parsed server response
     def restart!
       post '_restart'
     end
 
-    # Get a list of all databases available on the server
+    # Gets a list of all the databases available on the server
     #
-    # @return [Array] List of databases
+    # @return [Array] Parsed server response
     def databases
       get '_all_dbs'
     end
   
-    # Get a database
+    # Gets a new [Couchy::Database] for the database
     #
-    # @param [String] name Database's name
+    # @param [String] name The name of the database
+    #
     # @return [Couchy::Database] The database
     def database(name)
       Database.new(self, name)
     end
   
-    # Create a database
+    # Creates a database
     #
     # @param [String] name Database's name
+    #
     # @return [Couchy::Database] The newly created database
     def create_db(name)
       put(name)

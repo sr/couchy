@@ -10,9 +10,11 @@ module Couchy
       @server = server
     end
     
-    # Get a list of documents available in the database
+    # Gets a list of all the documents available in the database
     #
     # @param [Hash] params
+    #
+    # @return [Hash] Parsed server response
     def documents(params={})
       server.get("#{name}/_all_docs", params)
     end
@@ -21,37 +23,47 @@ module Couchy
     #
     # @param [String] function The view function
     # @param [Hash] params
+    #
+    # @return [Hash] Parsed server response
     def temp_view(function, params={})
       server.post("#{name}/_temp_view", function,
         params.merge!(:headers => {'Content-Type' => 'application/json'}))
     end
   
-    # Query the given view
+    # Query a view
     #
     # @param [String] view_name The name of the view
     # @param [Hash] params
+    #
+    # @return [Hash] Parsed server response
     def view(view_name, params={})
       server.get("#{name}/_view/#{view_name}", params)
     end
 
-    # Retrieve a document by its ID
+    # Retrieves a document by its ID
     #
     # @param [String] id The ID of the document
+    #
+    # @return [Hash] Parsed server response
     def get(id)
       server.get("#{name}/#{CGI.escape(id)}")
     end
     
-    # Retrieve an attachment from a document
+    # Retrieves an attachment from a document
     #
     # @param [String] document_id The ID of the document
     # @param [String] attachment_name The name of the attachment
+    #
+    # @return [Hash] Parsed server response
     def fetch_attachment(document_id, attachment_name)
       server.get("#{name}/#{CGI.escape(document_id)}/#{CGI.escape(attachment_name)}", :no_json => true)
     end
     
-    # Save or update a document
+    # Saves or updates a document
     #
     # @param [Hash] doc The document
+    #
+    # @return [Hash] Parsed server response
     def save(doc)
       doc = encode_attachments_of(doc)
 
@@ -62,17 +74,22 @@ module Couchy
       end
     end
     
-    # Save or update multiple documents
+    # Saves or updates a bunch of documents
     #
-    # @param [Array] docs The documents
+    # @param [Array] docs The documents to save
+    #
+    # @return [Hash] Parsed server response
     def bulk_save(docs)
       server.post("#{name}/_bulk_docs", {:docs => docs})
     end
     
-    # Delete a document
+    # Deletes a document
     #
     # @param [String, Hash] doc Document ID or a document
-    # @raise ArgumentError
+    #
+    # @raise ArgumentError Raises ArgumentError if given a document without ID
+    #
+    # @return [Hash] Parsed server response
     def delete(doc)
       case doc
       when String
@@ -87,7 +104,9 @@ module Couchy
       end
     end
     
-    # Delete the database
+    # Deletes the current database
+    #
+    # @return [Hash] Parsed server response
     def delete!
       server.delete(name)
     end

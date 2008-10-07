@@ -11,7 +11,7 @@ module Couchy
 
   # Shortcut for Couchy::Server.new
   #
-  # @param [String] server_uri The URI of the CouchDB server. defaults to "http://localhost:5984/"
+  # @param [String] uri The URI of the CouchDB server. defaults to "http://localhost:5984/"
   # @return Couchy::Server
   def self.new(server_uri='http://localhost:5984/')
     Server.new(server_uri)
