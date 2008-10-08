@@ -31,7 +31,7 @@ end
 
 YARD::Rake::YardocTask.new
 
-task :public => [:"publish:doc", :"publish:coverage"]
+task :publish => [:"publish:doc", :"publish:coverage"]
 
 namespace :publish do
   task :doc => :yardoc do
