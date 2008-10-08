@@ -63,8 +63,8 @@ module Couchy
       json RestClient.put(uri_for(path), payload)
     end
 
-    def delete(path)
-      json RestClient.delete(uri_for(path))
+    def delete(path, params={})
+      json RestClient.delete(uri_for(path, params))
     end
 
     private

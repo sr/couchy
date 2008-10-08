@@ -85,20 +85,24 @@ module Couchy
     
     # Deletes a document
     #
-    # @param [String, Hash] doc Document ID or a document
+    # @param [String, Hash] document Document ID or an Hash representing the document
+    # @param [String] revision Document's revision
     #
-    # @raise ArgumentError Raises ArgumentError if given a document without ID
+    # @raise ArgumentError When the Hash representing the document neither has
+    #                      an ID nor a revision
+    #
+    # @raise ArgumentError When document is neither an ID nor an Hash
+    #                      representing a document
     #
     # @return [Hash] Parsed server response
-    def delete(doc)
-      case doc
+    def delete(document, revision=nil)
+      case document
       when String
-        server.delete "#{name}/#{CGI.escape(doc)}"
+        raise ArgumentError unless revision
+        server.delete "#{name}/#{CGI.escape(document)}", :rev => revision
       when Hash
-        raise ArgumentError unless doc['_id']
-        path = "#{name}/#{CGI.escape(doc['_id'])}"
-        path << "?rev=#{doc['_rev']}" if doc['_rev']
-        server.delete path
+        raise ArgumentError unless document['_id'] && document['_rev']
+        server.delete("#{name}/#{CGI.escape(document['_id'])}", :rev => document['_rev'])
       else
         raise ArgumentError
       end

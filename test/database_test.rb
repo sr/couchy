@@ -124,36 +124,35 @@ describe 'Database' do
   end
 
   describe 'Deleting a document' do
-    describe 'When given the document id' do
-      it 'DELETE $database_name/$document_id' do
-        @server.expects(:delete).with("#{TestDatabase}/mydocid")
-        @database.delete('mydocid')
+    describe 'When given the document id and the revision' do
+      it 'DELETE $database_name/$document_id?rev=$revision' do
+        @server.expects(:delete).with("#{TestDatabase}/mydocid", :rev => 2800624930)
+        @database.delete('mydocid', 2800624930)
       end
 
-      it 'escapes the given document id' do
+      it 'escapes the document id' do
         CGI.expects(:escape).with('mydocid')
-        @database.delete('mydocid')
+        @database.delete('mydocid', 2800624930)
       end
     end
 
     describe 'When given an Hash representing a document' do
-      it 'raises ArgumentError if it do not have an _id key' do
+      it 'raises ArgumentError if the doc doesnt have an _id' do
         lambda { @database.delete('foo' => 'bar') }.should.raise(ArgumentError)
       end
 
-      it 'DELETE $database_name/$document_id' do
-        @server.expects(:delete).with("#{TestDatabase}/mydocid")
-        @database.delete('_id' => 'mydocid')
+      it 'raises ArgumentError if the doc doesnt have a _rev' do
+        lambda { @database.delete('_id' => 'foo') }.should.raise(ArgumentError)
       end
 
-      it 'DELETE $database_name/$document_id?rev=$revision_id' do
-        @server.expects(:delete).with("#{TestDatabase}/mydocid?rev=34")
-        @database.delete('_id' => 'mydocid', '_rev' => 34)
+      it 'DELETE $database_name/$document_id?rev=$revision' do
+        @server.expects(:delete).with("#{TestDatabase}/mydocid", :rev => 2800624930)
+        @database.delete('_id' => 'mydocid', '_rev' => 2800624930)
       end
 
-      it 'escapes the given document id' do
+      it 'escapes the document id' do
         CGI.expects(:escape).with('mydocid')
-        @database.delete('_id' => 'mydocid')
+        @database.delete('_id' => 'mydocid', '_rev' => 286633)
       end
     end
 

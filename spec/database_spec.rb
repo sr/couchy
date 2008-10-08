@@ -370,6 +370,12 @@ describe Couchy::Database do
       @database.delete doc
       lambda{@database.get @docid}.should raise_error
     end
+
+    it 'should work with document id an revision id' do
+      doc = @database.get(@docid)
+      @database.delete(@docid, doc['_rev'])
+      lambda { @database.get(@docid) }.should raise_error
+    end
   end
   
   it "should list documents" do

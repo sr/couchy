@@ -156,6 +156,12 @@ describe 'Server' do
         RestClient.expects(:delete).with('http://localhost:5984/a/b')
         @server.delete('a/b')
       end
+
+      it 'appends the given parameters as the query string' do
+        @server.stubs(:json)
+        RestClient.expects(:delete).with('http://localhost:5984/foo/bar?a=b')
+        @server.delete('foo/bar', :a => :b)
+      end
     end
   end
 
