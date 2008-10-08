@@ -98,13 +98,14 @@ module Couchy
     def delete(document, revision=nil)
       case document
       when String
-        raise ArgumentError unless revision
+        raise ArgumentError, 'Document revision must be specified' unless revision
         server.delete "#{name}/#{CGI.escape(document)}", :rev => revision
       when Hash
-        raise ArgumentError unless document['_id'] && document['_rev']
+        raise ArgumentError, 'Document ID and revision must be specified' unless
+          document['_id'] && document['_rev']
         server.delete("#{name}/#{CGI.escape(document['_id'])}", :rev => document['_rev'])
       else
-        raise ArgumentError
+        raise ArgumentError, 'Document must be an Hash representing the document or its ID'
       end
     end
     
