@@ -5,12 +5,15 @@ Couchy is a simple, no-frills, Ruby wrapper around the nice
 
 h2. Quick overview
 
-bc.. server = CouchRest.new
+<pre>
+server = CouchRest.new
 database = server.database('articles')
 response = database.save(:title => 'Atom-Powered Robots Run Amok', :content => 'Some text.')
 document = database.get(response['id'])
 database.delete(document)
 puts document.inspect
+</pre>
+
 
 h2. Requirements
 
