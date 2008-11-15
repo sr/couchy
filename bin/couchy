@@ -1,0 +1,80 @@
+#!/usr/bin/env ruby
+require 'rubygems'
+require 'thor'
+require 'fileutils'
+require 'pathname'
+
+require File.dirname(__FILE__) + '/../lib/couchy'
+
+module Couchy
+  class ViewManager < Thor
+    desc 'generate DESIGN VIEW',
+         'Generate directory structure for DESIGN/VIEW in PATH suitable for the `push` task.'
+    def generate(path, design, view='all')
+      path = File.join(Dir.pwd, path, design)
+      FileUtils.mkdir_p path
+      create_sample_view(path, view)
+    end
+
+    desc 'push PATH DATABASE', 'Push views avalaible in PATH to DATABASE.'
+    method_options :server   => :optional,
+                   :force    => :boolean
+    def push(path, database_name)
+      @database_name = database_name
+      designs   = find_designs(path)
+      documents = designs.map { |design| document_for(*design) }
+      documents.each do |document|
+        if document_exists?(document) && options[:force]
+          puts "Deleting `#{document['_id']}'"
+          database.delete database.get(document['_id'])
+        end
+        puts "Saving `#{document['_id']}' to `#{database.name}' on `#{server.uri}'"
+        database.save(document)
+      end
+    end
+
+    private
+      def find_designs(path)
+        views = Dir[File.join(path, '**/*-*.js')].inject({}) do |memo, path|
+          path   = Pathname.new(path)
+          parts  = path.split
+          design = parts.first.split.last.to_s
+          view   = parts.last.to_s
+          view_type = view[/\-(\w+)\.js/] && $1
+          view_body = File.read(path)
+          memo.tap do |memo|
+            memo[design] = {} unless memo[design]
+            memo[design][view_type] = view_body
+          end
+        end
+      end
+
+      def document_for(name, views)
+        { '_id'      => "_design/#{name}",
+          'language' => 'javascript',
+          'views'    => views }
+      end
+
+      def create_sample_view(path, view)
+        File.open(File.join(path, "#{view}-map.js"), 'w') do |file|
+          file.puts 'function(doc) {'
+          file.puts '  emit(null, doc);'
+          file.puts '}'
+        end
+      end
+
+      def document_exists?(document)
+        database.documents['rows'].collect { |row| row['id'] }.include?(document['_id'])
+      end
+
+      def database
+        @database ||= server.database(@database_name)
+      end
+
+      def server
+        @server ||= options[:server] ? Couchy::Server.new(options[:server]) : Couchy.new
+      end
+  end
+end
+
+Couchy::ViewManager.start
