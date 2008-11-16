@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.has_rdoc = false
   s.executables = ['couchy']
 
-  s.files = %(
+  s.files = %w(
     README.textile
     Rakefile
     bin/couchy
