@@ -40,11 +40,13 @@ module Couchy
           parts  = path.split
           design = parts.first.split.last.to_s
           view   = parts.last.to_s
-          view_type = view[/\-(\w+)\.js/] && $1
+          view_name = view.split('-').first
+          view_type = view.split('-').last.sub('.js', '')
           view_body = File.read(path)
           memo.tap do |memo|
             memo[design] = {} unless memo[design]
-            memo[design][view_type] = view_body
+            memo[design][view_name] = {} unless memo[design][view_name]
+            memo[design][view_name][view_type] = view_body
           end
         end
       end

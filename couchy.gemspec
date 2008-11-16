@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name     = 'couchy'
-  s.version  = '0.0.2'
+  s.version  = '0.0.3'
   s.date     = '2008-10-07'
   s.summary  = 'Simple, no-frills, Ruby wrapper around the nice CouchDB HTTP API'
   s.description = 'Simple, no-frills, Ruby wrapper around the nice CouchDB HTTP API'
