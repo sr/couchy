@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.executables = ['couchy']
 
   s.files = %w(
-    README.textile
+    README.markdown
     Rakefile
     bin/couchy
     couchy.gemspec
